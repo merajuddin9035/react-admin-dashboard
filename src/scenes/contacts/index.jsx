@@ -1,55 +1,48 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 
 const Contacts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [contacts, setContacts] = useState([]);
+
+  const fetchContacts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/USERS');
+      const contactsData = response.data.map((contact, index) => ({
+        id: index + 1, // Assigning a unique id to each row
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        age: contact.age, // Assuming age is fetched from the backend
+        address: contact.address, // Assuming address is fetched from the backend
+        city: contact.city, // Assuming city is fetched from the backend
+        zip: contact.zip, // Assuming zipCode is fetched from the backend
+      }));
+      setContacts(contactsData);
+    } catch (error) {
+      console.error('Error fetching contacts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []); // Fetch contacts on component mount
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
-    { field: "registrarId", headerName: "Registrar ID" },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    {
-      field: "phone",
-      headerName: "Phone Number",
-      flex: 1,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-    },
-    {
-      field: "address",
-      headerName: "Address",
-      flex: 1,
-    },
-    {
-      field: "city",
-      headerName: "City",
-      flex: 1,
-    },
-    {
-      field: "zipCode",
-      headerName: "Zip Code",
-      flex: 1,
-    },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "phone", headerName: "Phone Number", flex: 1 },
+    { field: "age", headerName: "Age", flex: 1 },
+    { field: "address", headerName: "Address", flex: 1 },
+    { field: "city", headerName: "City", flex: 1 },
+    { field: "zip", headerName: "Zip", flex: 1 },
   ];
 
   return (
@@ -91,7 +84,7 @@ const Contacts = () => {
         }}
       >
         <DataGrid
-          rows={mockDataContacts}
+          rows={contacts}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
         />
